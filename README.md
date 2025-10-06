@@ -1,86 +1,155 @@
-# Decentralized Image Upload and Sharing
+# GDrive 3.0 — Decentralized Drive (React + Hardhat + IPFS/Pinata)
 
-This project facilitates decentralized image upload and sharing on the blockchain using Solidity for the smart contract and React for the front-end interface. It enables users to securely upload images to IPFS (InterPlanetary File System) and share access with specified users through smart contract functionality.
+A simple decentralized image drive:
+- Files are uploaded to IPFS via Pinata
+- The smart contract stores `ipfs://` URIs and manages access control
+- The React UI lets you connect your wallet, upload, browse, and share access
 
-Here is the video in English - [Decentralize Google Drive](https://youtu.be/M-KRLlHG_zs?si=rD7I-fH-P8kGiwwf)
+## Monorepo Layout
 
-Here is the video in Hindi - [Decentralize Google Drive](https://youtu.be/fghqq3-P3x0?si=CVMpHFTW3-fa3R3A)
+- `client/` — React frontend (Create React App)
+- `contracts/` — Solidity smart contracts
+- `scripts/` — Hardhat deployment scripts
+- `hardhat.config.js` — Hardhat configuration
 
-## Features
+## Prerequisites
 
-- **Decentralized Storage:** Images are uploaded to IPFS, ensuring decentralized and immutable storage.
-- **Smart Contract:** Utilizes Solidity smart contracts on the Ethereum blockchain for access control and ownership management.
-- **Access Control:** Users can grant or revoke access to their uploaded images to specific individuals through the smart contract.
+- Node.js 16+ and npm
+- MetaMask browser extension
+- Pinata account (API Keys or JWT)
+- Hardhat (installed via devDependencies)
 
-## Technologies Used
+## 1) Install dependencies
 
-- **Solidity:** Smart contract development for ownership and access control.
-- **React:** Front-end interface for uploading images and managing access.
-- **IPFS:** Decentralized storage protocol for hosting uploaded images.
+```bash
+# From repo root
+npm install
 
-## Usage
+# Then install frontend deps
+cd client
+npm install
+```
 
-### Installation
+## 2) Environment variables (client/.env)
 
-1. Clone the repository:
+Create `client/.env` (in the client folder, not the repo root). Restart the dev server after any change.
 
-   ```bash
-   git clone https://github.com/your-username/decentralized-image-upload.git
-   ```
-2. Install dependencies for the hardhat:
+Required:
+```
+REACT_APP_CONTRACT_ADDRESS=0xYourDeployedContractAddress
+```
 
-   ```bash
-   # Navigate to the root directory
-   cd Dgdrive3.0
-   # Install hardhat dependencies
-   npm install
-   ```
-3. Compile the smart contract for artifacts:
+Pinata authentication (choose ONE of the following):
+- Preferred (JWT):
+```
+REACT_APP_PINATA_JWT=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...  # example
+```
+- Or API key + secret:
+```
+REACT_APP_PINATA_API_KEY=your_pinata_api_key
+REACT_APP_PINATA_SECRET_KEY=your_pinata_secret
+```
 
-   ```bash
-   # Compile Smart Contract
-   npx hardhat compile
-   ```
-4. Deploy the Solidity smart contract to an Ethereum testnet or local development environment.
-   ```bash
-   # Deploy Smart Contract
-   npx hardhat run scripts/deploy.js --network <network-name>
-   ```
-5. Install dependencies for the React front end:
-   ```bash
-   # Navigate to the React client directory
-   cd client 
-   # Install React dependencies
-   npm install
-   ```
-6. Run the react application:
-   ```bash
-   # Start React Application
-   npm start
-   ```
-   
-### Configuration
+Notes:
+- No quotes and no spaces around `=`.
+- Variable names must start with `REACT_APP_` to be available in the React app.
+- Never commit your `.env` file.
 
-1. Set up environment variables:
+## 3) Compile and deploy the contract
 
-   - Obtain API keys for Pinata to interact with IPFS.
-   - Update the React component (FileUpload.js) with your Pinata API keys.
-     
-### Usage
+Local (Hardhat) network:
+```bash
+# From repo root
+npx hardhat compile
+npx hardhat node                         # terminal A (keeps running)
 
-Once the setup and configuration are complete, follow these steps to utilize the decentralized image upload and sharing system:
+# In another terminal (repo root)
+npx hardhat run scripts/deploy.js --network localhost
+# Output example:
+# Library deployed to: 0x5FbDB2315678afecb367f032d93F642f64180aa3
+```
+Copy the printed address into `REACT_APP_CONTRACT_ADDRESS` in `client/.env`.
 
-1. **Install Metamask:**
-   - Ensure Metamask is installed and configured in your browser for Ethereum interactions.
+Testnet/Mainnet:
+1. Configure the target network in `hardhat.config.js` (RPC URL, chainId, accounts/private key)
+2. Fund the deployer address
+3. Deploy:
+```bash
+npx hardhat run scripts/deploy.js --network <network>
+```
+4. Put the deployed address into `REACT_APP_CONTRACT_ADDRESS`.
 
-2. **Update Contract Address:**
-   - After smart contract deployment, make sure to update the contract address in `App.js` within the React application.
+## 4) Run the app
 
-3. **Upload Image before "Get Data":**
-   - Click "Get Data" only after uploading an image on Pinata. Otherwise, it will throw an error stating "You don't have access".
+```bash
+# From client/
+npm start
+```
+Open `http://localhost:3000`, connect MetaMask (ensure it’s on the same network as the deployed contract), then use the tabs:
+- Gallery — browse your images or shared images
+- Upload — upload a new image to IPFS (Pinata)
+- Share Access — grant access to another address
 
-4. **Accessing Other User Images:**
-   - Use the "Get Data" button to access other users' images. Input the user's address in the designated box, but remember, you can only access their images if they've granted you access through the smart contract. Otherwise, it will throw an error saying "You don't have access".
+## Using the App
 
-These steps will ensure smooth navigation and utilization of the system while maintaining access control and avoiding potential errors.
+1. Click “Connect MetaMask” and approve the connection
+2. Upload:
+   - Drag & drop or choose an image
+   - Progress appears; on success, the contract is updated with `ipfs://<hash>`
+3. Gallery:
+   - Shows your images
+   - Enter another address and “Get Images” if they shared with you
+4. Share Access:
+   - Grant another address permission to see your images
+
+## Troubleshooting
+
+- Connect button does nothing
+  - Make sure MetaMask is installed and unlocked
+  - If you see “request already pending”, open the MetaMask extension window and approve
+
+- “Contract not configured”
+  - Set `REACT_APP_CONTRACT_ADDRESS` in `client/.env` and restart `npm start`
+  - Ensure MetaMask is on the same network as the deployed contract (Localhost 8545 or your testnet)
+
+- Upload fails: “Pinata authentication failed” (401/403)
+  - Verify `REACT_APP_PINATA_JWT` (recommended) or `REACT_APP_PINATA_API_KEY` + `REACT_APP_PINATA_SECRET_KEY`
+  - Restart the dev server after editing `.env`
+
+- Upload fails: “Rate limited” (429)
+  - Wait and retry; consider upgrading your Pinata plan
+
+- Network/CORS error to Pinata
+  - Check your internet connection and try again
+
+## Scripts reference
+
+Root (Hardhat):
+```bash
+npx hardhat compile
+npx hardhat node
+npx hardhat run scripts/deploy.js --network <network>
+```
+
+Frontend (client):
+```bash
+npm start
+npm run build
+npm test
+```
+
+## Security notes
+
+- Do not commit `.env`
+- Prefer using a Pinata JWT in the browser over key+secret
+- Rotate keys/JWT if exposed
+
+## Tech Stack
+
+- Solidity, Hardhat, Ethers.js
+- React (CRA), modern dark UI with animations
+- IPFS via Pinata
+
+---
+If you run into issues, please copy the exact error message and I’ll help you resolve it quickly.
 
