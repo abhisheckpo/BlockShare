@@ -1,39 +1,93 @@
 /* Import Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 :root {
-  --bg: #0b0f19;
-  --surface: #121826;
-  --elevated: #1b2336;
-  --text: #e6eaf2;
-  --muted: #9aa4b2;
+  /* Dark Theme Colors */
+  --bg: #0a0e1a;
+  --bg-gradient: linear-gradient(135deg, #0a0e1a 0%, #1a1f35 100%);
+  --surface: #0f1420;
+  --elevated: #1a1f35;
+  --elevated-hover: #252b45;
+  
+  /* Text Colors */
+  --text: #f0f4ff;
+  --text-secondary: #c5cfe0;
+  --muted: #8892a6;
+  --muted-dark: #5a6478;
+  
+  /* Brand Colors */
   --primary: #6c8cff;
-  --primary-variant: #3b5bdb;
+  --primary-light: #8fa5ff;
+  --primary-dark: #5574e8;
+  --primary-variant: #4a5fd9;
+  
   --accent: #6ee7b7;
-  --danger: #ef4444;
+  --accent-light: #8fffcf;
+  --accent-dark: #4cd19a;
+  
+  --secondary: #a78bfa;
+  --secondary-light: #c4b5fd;
+  
+  /* Status Colors */
   --success: #22c55e;
-  --radius: 12px;
-  --shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-  --transition-fast: 150ms cubic-bezier(.2,.8,.2,1);
-  --transition-slow: 350ms cubic-bezier(.2,.8,.2,1);
+  --success-light: #4ade80;
+  --danger: #ef4444;
+  --danger-light: #f87171;
+  --warning: #f59e0b;
+  --info: #3b82f6;
+  
+  /* Shadows & Effects */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 24px 64px rgba(0, 0, 0, 0.6);
+  --shadow-primary: 0 12px 32px rgba(108, 140, 255, 0.3);
+  --shadow-accent: 0 12px 32px rgba(110, 231, 183, 0.25);
+  
+  --glow-primary: 0 0 20px rgba(108, 140, 255, 0.5);
+  --glow-accent: 0 0 20px rgba(110, 231, 183, 0.5);
+  
+  /* Border Radius */
+  --radius-sm: 8px;
+  --radius: 16px;
+  --radius-lg: 20px;
+  --radius-xl: 24px;
+  
+  /* Transitions */
+  --transition-fast: 150ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  --transition-medium: 250ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  --transition-slow: 400ms cubic-bezier(0.2, 0.8, 0.2, 1);
   
   /* Typography */
-  --font-heading: 'Poppins', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-  --font-body: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  --font-heading: 'Poppins', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-body: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Courier New', monospace;
   
   /* Animation Curves */
-  --bounce: cubic-bezier(0.68, -0.6, 0.32, 1.6);
+  --bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
   --smooth: cubic-bezier(0.45, 0, 0.55, 1);
   --decel: cubic-bezier(0, 0, 0.2, 1);
   --accel: cubic-bezier(0.8, 0, 1, 1);
+  --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Reset & Base Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 *::selection {
-  background: rgba(108, 140, 255, 0.35);
+  background: rgba(108, 140, 255, 0.4);
   color: var(--text);
 }
 
-/* Base Styles */
+html {
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+}
+
 body {
   margin: 0;
   font-family: var(--font-body);
@@ -44,71 +98,181 @@ body {
   -moz-osx-font-smoothing: grayscale;
   background: var(--bg);
   color: var(--text);
+  overflow-x: hidden;
+  position: relative;
 }
 
+/* Animated Background Gradient */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    radial-gradient(circle at 20% 30%, rgba(108, 140, 255, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, rgba(110, 231, 183, 0.06) 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, rgba(167, 139, 250, 0.05) 0%, transparent 50%);
+  z-index: -1;
+  animation: gradientShift 20s ease infinite;
+}
+
+@keyframes gradientShift {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.05); }
+}
+
+/* Typography */
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
-  font-weight: 600;
-  line-height: 1.3;
-  letter-spacing: -0.02em;
-}
-
-h1 { font-size: 2.5rem; }
-h2 { font-size: 2rem; }
-h3 { font-size: 1.75rem; }
-h4 { font-size: 1.5rem; }
-h5 { font-size: 1.25rem; }
-h6 { font-size: 1rem; }
-
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
-}
-
-html, #root {
-  min-height: 100%;
-  background: var(--bg);
-}
-
-button, input, select, textarea {
-  font-family: inherit;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.03em;
   color: var(--text);
 }
 
-/* Page Transition Animation Classes */
-.page-enter {
-  opacity: 0;
-  transform: translateY(8px);
+h1 { font-size: clamp(2rem, 5vw, 3.5rem); }
+h2 { font-size: clamp(1.75rem, 4vw, 2.5rem); }
+h3 { font-size: clamp(1.5rem, 3vw, 2rem); }
+h4 { font-size: clamp(1.25rem, 2.5vw, 1.75rem); }
+h5 { font-size: clamp(1.125rem, 2vw, 1.5rem); }
+h6 { font-size: 1.125rem; }
+
+p {
+  margin-bottom: 1rem;
+  color: var(--text-secondary);
 }
 
-.page-enter-active {
-  opacity: 1;
-  transform: translateY(0);
-  transition: opacity 300ms var(--decel), transform 300ms var(--decel);
+a {
+  color: var(--primary);
+  text-decoration: none;
+  transition: color var(--transition-fast);
 }
 
-.page-exit {
-  opacity: 1;
+a:hover {
+  color: var(--primary-light);
 }
 
-.page-exit-active {
-  opacity: 0;
-  transition: opacity 200ms var(--accel);
+code {
+  font-family: var(--font-mono);
+  background: var(--elevated);
+  padding: 0.2em 0.4em;
+  border-radius: 4px;
+  font-size: 0.9em;
 }
 
-/* Reusable Animation Classes */
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--surface);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--elevated);
+  border-radius: 6px;
+  border: 2px solid var(--surface);
+  transition: background var(--transition-fast);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
+}
+
+/* Form Elements */
+button, input, select, textarea {
+  font-family: inherit;
+  color: var(--text);
+  outline: none;
+}
+
+input, textarea, select {
+  background: var(--elevated);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-sm);
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  transition: all var(--transition-fast);
+  width: 100%;
+}
+
+input:focus, textarea:focus, select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(108, 140, 255, 0.2);
+  background: var(--elevated-hover);
+}
+
+input::placeholder, textarea::placeholder {
+  color: var(--muted);
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  font-weight: 500;
+  transition: all var(--transition-fast);
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Utility Classes */
+.text-gradient {
+  background: linear-gradient(135deg, var(--primary-light), var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.glass {
+  background: rgba(26, 31, 53, 0.6);
+  backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-strong {
+  background: rgba(26, 31, 53, 0.85);
+  backdrop-filter: blur(24px) saturate(200%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+/* Animation Classes */
 .fade-up {
   animation: fadeUp 600ms var(--decel) both;
 }
 
-.scale-in {
-  animation: scaleIn 400ms var(--bounce) both;
+.fade-in {
+  animation: fadeIn 500ms var(--decel) both;
 }
 
+.scale-in {
+  animation: scaleIn 400ms var(--spring) both;
+}
+
+.slide-in-left {
+  animation: slideInLeft 500ms var(--decel) both;
+}
+
+.slide-in-right {
+  animation: slideInRight 500ms var(--decel) both;
+}
+
+.bounce-in {
+  animation: bounceIn 600ms var(--bounce) both;
+}
+
+/* Keyframe Animations */
 @keyframes fadeUp {
   from {
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(24px);
   }
   to {
     opacity: 1;
@@ -116,13 +280,130 @@ button, input, select, textarea {
   }
 }
 
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
 @keyframes scaleIn {
   from {
     opacity: 0;
-    transform: scale(0.95);
+    transform: scale(0.92);
   }
   to {
     opacity: 1;
     transform: scale(1);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes bounceIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  70% {
+    transform: scale(0.95);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.02);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Loading Spinner */
+.spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: rotate 0.8s linear infinite;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  body {
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    font-size: 14px;
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

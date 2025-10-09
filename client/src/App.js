@@ -1,6 +1,8 @@
 import Upload from "./artifacts/contracts/Upload.sol/Upload.json";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ethers } from "ethers";
+import Navbar from "./components/Navbar";
+import Footer from "./components/Footer";
 import FileUpload from "./components/FileUpload";
 import Display from "./components/Display";
 import Modal from "./components/Modal";
@@ -14,6 +16,8 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('gallery');
   const [connectError, setConnectError] = useState("");
+  const [manualAddress, setManualAddress] = useState("");
+  const networkSwitchInFlightRef = useRef(false);
 
   const getInjectedEthereum = () => {
     const eth = window.ethereum;
@@ -26,6 +30,67 @@ function App() {
     return eth;
   };
 
+  // Ensure MetaMask is on Hardhat Localhost 8545 (chainId 31337) with single-flight guard
+  const ensureHardhatNetwork = async () => {
+    const injected = getInjectedEthereum();
+    if (!injected) return;
+    if (networkSwitchInFlightRef.current) return; // avoid duplicate prompts
+    try {
+      networkSwitchInFlightRef.current = true;
+      const currentChainId = await injected.request({ method: "eth_chainId" });
+      if (currentChainId === "0x7a69") return; // already on 31337
+
+      // Try to switch first
+      try {
+        await injected.request({
+          method: "wallet_switchEthereumChain",
+          params: [{ chainId: "0x7a69" }],
+        });
+        return;
+      } catch (switchError) {
+        // If chain is unrecognized, add it, then switch
+        if (switchError && switchError.code === 4902) {
+          try {
+            await injected.request({
+              method: "wallet_addEthereumChain",
+              params: [{
+                chainId: "0x7a69",
+                chainName: "Hardhat Localhost 8545",
+                rpcUrls: ["http://127.0.0.1:8545", "http://localhost:8545"],
+                nativeCurrency: { name: "Ether", symbol: "ETH", decimals: 18 },
+              }],
+            });
+            // Switch after adding
+            await injected.request({
+              method: "wallet_switchEthereumChain",
+              params: [{ chainId: "0x7a69" }],
+            });
+            return;
+          } catch (addError) {
+            // If a request is already pending, surface a gentle hint and exit
+            if (addError && addError.code === -32002) {
+              console.warn("Network add/switch request already pending in MetaMask. Please approve it.");
+              setConnectError("Open MetaMask and approve the pending network request.");
+            }
+            throw addError;
+          }
+        }
+        // If another pending request (-32002), hint and return
+        if (switchError && switchError.code === -32002) {
+          console.warn("Network switch request already pending in MetaMask. Please approve it.");
+          setConnectError("Open MetaMask and approve the pending network request.");
+          return;
+        }
+        throw switchError;
+      }
+    } catch (e) {
+      // Keep errors non-fatal; connection flow can still continue
+      console.warn("ensureHardhatNetwork failed:", e);
+    } finally {
+      networkSwitchInFlightRef.current = false;
+    }
+  };
+
   const checkIfWalletIsConnected = async () => {
     try {
       const injected = getInjectedEthereum();
@@ -33,6 +98,9 @@ function App() {
         alert("Please install MetaMask!");
         return;
       }
+
+      // Try to switch to local Hardhat network
+      await ensureHardhatNetwork();
 
       const accounts = await injected.request({ method: 'eth_accounts' });
       
@@ -61,6 +129,9 @@ function App() {
 
       const web3Provider = new ethers.providers.Web3Provider(injected);
 
+      // Ensure we are on 31337 before requesting accounts (helps avoid wrong network)
+      await ensureHardhatNetwork();
+
       // Request account access
       const accounts = await injected.request({ method: 'eth_requestAccounts' });
 
@@ -86,8 +157,15 @@ function App() {
 
   const setupContractIfConfigured = async (web3Provider) => {
     try {
-      const contractAddress = process.env.REACT_APP_CONTRACT_ADDRESS;
-      if (contractAddress && ethers.utils.isAddress(contractAddress)) {
+      const envAddress = process.env.REACT_APP_CONTRACT_ADDRESS;
+      const storedAddress = (typeof window !== 'undefined') ? window.localStorage.getItem('contractAddress') : null;
+      const contractAddress = (envAddress && ethers.utils.isAddress(envAddress))
+        ? envAddress
+        : (storedAddress && ethers.utils.isAddress(storedAddress))
+          ? storedAddress
+          : null;
+
+      if (contractAddress) {
         const signer = web3Provider.getSigner();
         const contractInstance = new ethers.Contract(
           contractAddress,
@@ -146,48 +224,51 @@ function App() {
 
   return (
     <div className="app-wrapper">
+      <Navbar 
+        account={account}
+        onConnect={connectWallet}
+        onDisconnect={disconnectWallet}
+        isLoading={isLoading}
+        connectError={connectError}
+      />
+
       <div className="App">
-        <div className="bg"></div>
-        <div className="bg bg2"></div>
-        <div className="bg bg3"></div>
-
-        <header className="app-header fade-up" style={{ animationDelay: '200ms' }}>
-          <h1>Gdrive 3.0</h1>
-          
-          {account ? (
-            <div className="wallet-info">
-              <div className="account-info">
-                <span className="address-label">Connected:</span>
-                <span className="address">{`${account.slice(0, 6)}...${account.slice(-4)}`}</span>
-              </div>
-              <button className="wallet-button disconnect" onClick={disconnectWallet}>
-                Disconnect
-              </button>
-            </div>
-          ) : (
-            <button 
-              className={`wallet-button connect ${isLoading ? 'loading' : ''}`} 
-              onClick={connectWallet}
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <span className="loading-text">Connecting...</span>
-              ) : (
-                <>
-                  <span className="wallet-icon">🦊</span>
-                  Connect MetaMask
-                </>
-              )}
-            </button>
-          )}
-          {!account && connectError && (
-            <div className="connect-error">{connectError}</div>
-          )}
-        </header>
-
         {account ? (
           <>
-            <nav className="app-nav fade-up" style={{ animationDelay: '300ms' }}>
+            {!contract && (
+              <div className="contract-setup fade-up" style={{ animationDelay: '100ms' }}>
+                <div className="contract-setup-row">
+                  <input
+                    className="contract-input"
+                    type="text"
+                    placeholder="Paste contract address (0x...) and click Set"
+                    value={manualAddress}
+                    onChange={(e) => setManualAddress(e.target.value)}
+                  />
+                  <button
+                    className="contract-button"
+                    onClick={() => {
+                      try {
+                        const trimmed = (manualAddress || '').trim();
+                        if (!ethers.utils.isAddress(trimmed)) return;
+                        if (typeof window !== 'undefined') {
+                          window.localStorage.setItem('contractAddress', trimmed);
+                        }
+                        if (provider) {
+                          setupContractIfConfigured(provider);
+                        }
+                      } catch {}
+                    }}
+                    disabled={!manualAddress || !ethers.utils.isAddress((manualAddress || '').trim())}
+                  >
+                    Set
+                  </button>
+                </div>
+                <div className="contract-help">If .env wasn't picked up, you can set the address here.</div>
+              </div>
+            )}
+            
+            <nav className="app-nav fade-up" style={{ animationDelay: '200ms' }}>
               <button 
                 className={`nav-button ${activeTab === 'gallery' ? 'active' : ''}`}
                 onClick={() => setActiveTab('gallery')}
@@ -213,7 +294,7 @@ function App() {
 
             <main className="app-main">
               {activeTab === 'upload' ? (
-                <div className="fade-up" style={{ animationDelay: '400ms' }}>
+                <div className="fade-up" style={{ animationDelay: '300ms' }}>
                   <FileUpload
                     account={account}
                     provider={provider}
@@ -222,20 +303,22 @@ function App() {
                   />
                 </div>
               ) : (
-                <div className="fade-up" style={{ animationDelay: '400ms' }}>
+                <div className="fade-up" style={{ animationDelay: '300ms' }}>
                   <Display contract={contract} account={account} />
                 </div>
               )}
             </main>
           </>
         ) : (
-          <div className="connect-prompt fade-up" style={{ animationDelay: '300ms' }}>
+          <div className="connect-prompt fade-up" style={{ animationDelay: '200ms' }}>
             <div className="prompt-icon">🦊</div>
             <h2>Connect Your Wallet</h2>
             <p>Please connect your MetaMask wallet to access your decentralized drive</p>
           </div>
         )}
       </div>
+
+      <Footer />
 
       {modalOpen && (
         <Modal setModalOpen={setModalOpen} contract={contract}></Modal>
