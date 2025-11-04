@@ -9,6 +9,7 @@ import Display from "./components/Display";
 import Modal from "./components/Modal";
 import Login from "./components/Login";
 import Register from "./components/Register";
+import Profile from "./components/Profile";
 import "./App.css";
 
 function App() {
@@ -221,10 +222,11 @@ function App() {
     const token = localStorage.getItem('userToken');
     const email = localStorage.getItem('userEmail');
     const userId = localStorage.getItem('userId');
+    const username = localStorage.getItem('username');
     
     if (token && email && userId) {
       setIsAuthenticated(true);
-      setUserInfo({ email, userId, token });
+      setUserInfo({ email, userId, username: username || 'User', token });
       checkIfWalletIsConnected();
     }
     
@@ -390,6 +392,28 @@ function App() {
           element={
             isAuthenticated ? (
               <MainApp />
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          } 
+        />
+        <Route 
+          path="/profile" 
+          element={
+            isAuthenticated ? (
+              <div className="app-wrapper">
+                <Navbar 
+                  account={account}
+                  onConnect={connectWallet}
+                  onDisconnect={disconnectWallet}
+                  isLoading={isLoading}
+                  connectError={connectError}
+                  userInfo={userInfo}
+                  onLogout={handleLogout}
+                />
+                <Profile userInfo={userInfo} />
+                <Footer />
+              </div>
             ) : (
               <Navigate to="/login" replace />
             )

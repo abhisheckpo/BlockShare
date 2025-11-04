@@ -70,6 +70,7 @@ const Register = ({ onRegisterSuccess, onSwitchToLogin }) => {
         localStorage.setItem('userToken', response.data.token);
         localStorage.setItem('userEmail', response.data.email);
         localStorage.setItem('userId', response.data.userId);
+        localStorage.setItem('username', response.data.username || 'User');
         onRegisterSuccess(response.data);
       }
     } catch (err) {

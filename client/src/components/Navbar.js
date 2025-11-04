@@ -1,6 +1,7 @@
 import React from 'react';
 import './Navbar.css';
 import ThemeToggle from './ThemeToggle';
+import UserMenu from './UserMenu';
 
 const Navbar = ({ account, onConnect, onDisconnect, isLoading, connectError, userInfo, onLogout }) => {
   return (
@@ -16,15 +17,6 @@ const Navbar = ({ account, onConnect, onDisconnect, isLoading, connectError, use
 
         <div className="navbar-menu">
           <ThemeToggle />
-          
-          {userInfo && (
-            <>
-              <div className="user-info">
-                <span className="user-icon">👤</span>
-                <span className="user-email">{userInfo.email}</span>
-              </div>
-            </>
-          )}
           
           {account ? (
             <div className="wallet-section">
@@ -58,10 +50,8 @@ const Navbar = ({ account, onConnect, onDisconnect, isLoading, connectError, use
             </button>
           ) : null}
           
-          {userInfo && onLogout && (
-            <button className="btn-logout" onClick={onLogout}>
-              Logout
-            </button>
+          {userInfo && (
+            <UserMenu userInfo={userInfo} onLogout={onLogout} />
           )}
         </div>
       </div>

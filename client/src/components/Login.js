@@ -48,6 +48,7 @@ const Login = ({ onLoginSuccess, onSwitchToRegister }) => {
         localStorage.setItem('userToken', response.data.token);
         localStorage.setItem('userEmail', response.data.email);
         localStorage.setItem('userId', response.data.userId);
+        localStorage.setItem('username', response.data.username || 'User');
         onLoginSuccess(response.data);
       }
     } catch (err) {
