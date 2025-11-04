@@ -101,13 +101,10 @@ function App() {
     try {
       const injected = getInjectedEthereum();
       if (!injected) {
-        alert("Please install MetaMask!");
-        return;
+        return; // Silently return if MetaMask not installed
       }
 
-      // Try to switch to local Hardhat network
-      await ensureHardhatNetwork();
-
+      // Only check for existing accounts, don't prompt or switch networks
       const accounts = await injected.request({ method: 'eth_accounts' });
       
       if (accounts.length) {
@@ -227,7 +224,8 @@ function App() {
     if (token && email && userId) {
       setIsAuthenticated(true);
       setUserInfo({ email, userId, username: username || 'User', token });
-      checkIfWalletIsConnected();
+      // Don't auto-connect wallet on page load
+      // User must manually click "Connect Wallet" button
     }
     
     return () => {
