@@ -45,3 +45,23 @@ def verify_token(token):
     except Exception as e:
         return False, str(e)
 
+
+def decode_token(token):
+    """
+    Decode JWT token and return payload
+    Raises exception if token is invalid or expired
+    """
+    try:
+        payload = jwt.decode(
+            token,
+            settings.JWT_SECRET_KEY,
+            algorithms=[settings.JWT_ALGORITHM]
+        )
+        return payload
+    except jwt.ExpiredSignatureError:
+        raise Exception("Token has expired")
+    except jwt.InvalidTokenError:
+        raise Exception("Invalid token")
+    except Exception as e:
+        raise Exception(str(e))
+

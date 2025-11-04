@@ -9,3 +9,34 @@ typechain-types
 cache
 artifacts
 
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+*.egg-info/
+dist/
+build/
+*.egg
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Django
+*.log
+db.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+

@@ -409,7 +409,7 @@ function App() {
                   userInfo={userInfo}
                   onLogout={handleLogout}
                 />
-                <Profile userInfo={userInfo} />
+                <Profile userInfo={userInfo} setUserInfo={setUserInfo} />
                 <Footer />
               </div>
             ) : (

@@ -219,3 +219,249 @@ def verify_token_view(request):
             'error': f'Token verification failed: {str(e)}'
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
+@api_view(['POST'])
+def change_password(request):
+    """
+    Change user password
+    
+    Expected header: Authorization: Bearer <token>
+    Expected JSON payload:
+    {
+        "current_password": "string",
+        "new_password": "string"
+    }
+    """
+    try:
+        from .jwt_utils import decode_token
+        
+        # Get and validate authorization header
+        auth_header = request.headers.get('Authorization', '')
+        if not auth_header.startswith('Bearer '):
+            return Response({
+                'success': False,
+                'error': 'Invalid authorization header'
+            }, status=status.HTTP_401_UNAUTHORIZED)
+
+        # Decode token to get user_id
+        token = auth_header.split(' ')[1]
+        payload = decode_token(token)
+        user_id = payload.get('user_id')
+
+        # Get user
+        try:
+            user = User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            return Response({
+                'success': False,
+                'error': 'User not found'
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        # Get passwords from request
+        current_password = request.data.get('current_password', '')
+        new_password = request.data.get('new_password', '')
+
+        # Validate required fields
+        if not current_password or not new_password:
+            return Response({
+                'success': False,
+                'error': 'Both current and new passwords are required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Verify current password
+        if not user.check_password(current_password):
+            return Response({
+                'success': False,
+                'error': 'Current password is incorrect'
+            }, status=status.HTTP_401_UNAUTHORIZED)
+
+        # Validate new password strength
+        is_valid, error = User.validate_password_strength(new_password)
+        if not is_valid:
+            return Response({
+                'success': False,
+                'error': error
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Update password
+        user.password = new_password  # Will be hashed in model's save method
+        user.save()
+
+        return Response({
+            'success': True,
+            'message': 'Password changed successfully'
+        }, status=status.HTTP_200_OK)
+
+    except Exception as e:
+        return Response({
+            'success': False,
+            'error': f'Password change failed: {str(e)}'
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+def update_profile(request):
+    """
+    Update user profile (username and/or email)
+    
+    Expected header: Authorization: Bearer <token>
+    Expected JSON payload:
+    {
+        "username": "string",
+        "email": "string"
+    }
+    """
+    try:
+        from .jwt_utils import decode_token
+        
+        # Get and validate authorization header
+        auth_header = request.headers.get('Authorization', '')
+        if not auth_header.startswith('Bearer '):
+            return Response({
+                'success': False,
+                'error': 'Invalid authorization header'
+            }, status=status.HTTP_401_UNAUTHORIZED)
+
+        # Decode token to get user_id
+        token = auth_header.split(' ')[1]
+        payload = decode_token(token)
+        user_id = payload.get('user_id')
+
+        # Get user
+        try:
+            user = User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            return Response({
+                'success': False,
+                'error': 'User not found'
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        # Get data from request
+        username = request.data.get('username', '').strip()
+        email = request.data.get('email', '').strip().lower()
+
+        # Validate required fields
+        if not username or not email:
+            return Response({
+                'success': False,
+                'error': 'Username and email are required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Validate username if changed
+        if username != user.username:
+            is_valid, error = User.validate_username(username)
+            if not is_valid:
+                return Response({
+                    'success': False,
+                    'error': error
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Check if username is already taken
+            if User.objects.filter(username=username).exclude(id=user_id).exists():
+                return Response({
+                    'success': False,
+                    'error': 'Username already taken'
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Validate email if changed
+        if email != user.email:
+            is_valid, error = User.validate_email(email)
+            if not is_valid:
+                return Response({
+                    'success': False,
+                    'error': error
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Check if email is already registered
+            if User.objects.filter(email=email).exclude(id=user_id).exists():
+                return Response({
+                    'success': False,
+                    'error': 'Email already registered'
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Update user
+        user.username = username
+        user.email = email
+        user.save()
+
+        return Response({
+            'success': True,
+            'message': 'Profile updated successfully',
+            'username': user.username,
+            'email': user.email
+        }, status=status.HTTP_200_OK)
+
+    except Exception as e:
+        return Response({
+            'success': False,
+            'error': f'Profile update failed: {str(e)}'
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+def delete_account(request):
+    """
+    Delete user account
+    
+    Expected header: Authorization: Bearer <token>
+    Expected JSON payload:
+    {
+        "password": "string"
+    }
+    """
+    try:
+        from .jwt_utils import decode_token
+        
+        # Get and validate authorization header
+        auth_header = request.headers.get('Authorization', '')
+        if not auth_header.startswith('Bearer '):
+            return Response({
+                'success': False,
+                'error': 'Invalid authorization header'
+            }, status=status.HTTP_401_UNAUTHORIZED)
+
+        # Decode token to get user_id
+        token = auth_header.split(' ')[1]
+        payload = decode_token(token)
+        user_id = payload.get('user_id')
+
+        # Get user
+        try:
+            user = User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            return Response({
+                'success': False,
+                'error': 'User not found'
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        # Get password from request
+        password = request.data.get('password', '')
+
+        # Validate password
+        if not password:
+            return Response({
+                'success': False,
+                'error': 'Password is required to delete account'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Verify password
+        if not user.check_password(password):
+            return Response({
+                'success': False,
+                'error': 'Incorrect password'
+            }, status=status.HTTP_401_UNAUTHORIZED)
+
+        # Delete user
+        user.delete()
+
+        return Response({
+            'success': True,
+            'message': 'Account deleted successfully'
+        }, status=status.HTTP_200_OK)
+
+    except Exception as e:
+        return Response({
+            'success': False,
+            'error': f'Account deletion failed: {str(e)}'
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
