@@ -147,9 +147,31 @@
   letter-spacing: 0.02em;
 }
 
+/* User Info */
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 1.25rem;
+  background: rgba(108, 140, 255, 0.1);
+  border-radius: var(--radius);
+  border: 1px solid rgba(108, 140, 255, 0.2);
+}
+
+.user-icon {
+  font-size: 1.2rem;
+}
+
+.user-email {
+  color: var(--text);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
 /* Buttons */
 .btn-connect,
-.btn-disconnect {
+.btn-disconnect,
+.btn-logout {
   padding: 0.75rem 1.75rem;
   border-radius: var(--radius);
   font-weight: 600;
@@ -194,6 +216,18 @@
 .btn-disconnect:hover {
   background: rgba(239, 68, 68, 0.2);
   border-color: rgba(239, 68, 68, 0.5);
+  transform: translateY(-2px);
+}
+
+.btn-logout {
+  background: rgba(255, 152, 0, 0.1);
+  color: #ffab40;
+  border: 1px solid rgba(255, 152, 0, 0.3);
+}
+
+.btn-logout:hover {
+  background: rgba(255, 152, 0, 0.2);
+  border-color: rgba(255, 152, 0, 0.5);
   transform: translateY(-2px);
 }
 

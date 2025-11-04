@@ -1,7 +1,7 @@
 import React from 'react';
 import './Navbar.css';
 
-const Navbar = ({ account, onConnect, onDisconnect, isLoading, connectError }) => {
+const Navbar = ({ account, onConnect, onDisconnect, isLoading, connectError, userInfo, onLogout }) => {
   return (
     <nav className="navbar">
       <div className="navbar-container">
@@ -14,9 +14,14 @@ const Navbar = ({ account, onConnect, onDisconnect, isLoading, connectError }) =
         </div>
 
         <div className="navbar-menu">
-          <a href="#features" className="nav-link">Features</a>
-          <a href="#about" className="nav-link">About</a>
-          <a href="#docs" className="nav-link">Docs</a>
+          {userInfo && (
+            <>
+              <div className="user-info">
+                <span className="user-icon">👤</span>
+                <span className="user-email">{userInfo.email}</span>
+              </div>
+            </>
+          )}
           
           {account ? (
             <div className="wallet-section">
@@ -27,10 +32,10 @@ const Navbar = ({ account, onConnect, onDisconnect, isLoading, connectError }) =
                 </span>
               </div>
               <button className="btn-disconnect" onClick={onDisconnect}>
-                Disconnect
+                Disconnect Wallet
               </button>
             </div>
-          ) : (
+          ) : userInfo ? (
             <button 
               className={`btn-connect ${isLoading ? 'loading' : ''}`}
               onClick={onConnect}
@@ -47,6 +52,12 @@ const Navbar = ({ account, onConnect, onDisconnect, isLoading, connectError }) =
                   Connect Wallet
                 </>
               )}
+            </button>
+          ) : null}
+          
+          {userInfo && onLogout && (
+            <button className="btn-logout" onClick={onLogout}>
+              Logout
             </button>
           )}
         </div>

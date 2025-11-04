@@ -1,11 +1,14 @@
 import Upload from "./artifacts/contracts/Upload.sol/Upload.json";
 import { useState, useEffect, useRef } from "react";
 import { ethers } from "ethers";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import FileUpload from "./components/FileUpload";
 import Display from "./components/Display";
 import Modal from "./components/Modal";
+import Login from "./components/Login";
+import Register from "./components/Register";
 import "./App.css";
 
 function App() {
@@ -17,6 +20,8 @@ function App() {
   const [activeTab, setActiveTab] = useState('gallery');
   const [connectError, setConnectError] = useState("");
   const [manualAddress, setManualAddress] = useState("");
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userInfo, setUserInfo] = useState(null);
   const networkSwitchInFlightRef = useRef(false);
 
   const getInjectedEthereum = () => {
@@ -211,9 +216,18 @@ function App() {
     setProvider(null);
   };
 
-  // Check if wallet is connected on component mount
+  // Check authentication status on component mount
   useEffect(() => {
-    checkIfWalletIsConnected();
+    const token = localStorage.getItem('userToken');
+    const email = localStorage.getItem('userEmail');
+    const userId = localStorage.getItem('userId');
+    
+    if (token && email && userId) {
+      setIsAuthenticated(true);
+      setUserInfo({ email, userId, token });
+      checkIfWalletIsConnected();
+    }
+    
     return () => {
       const injected = getInjectedEthereum();
       if (injected) {
@@ -222,7 +236,21 @@ function App() {
     };
   }, []);
 
-  return (
+  const handleLoginSuccess = (userData) => {
+    setIsAuthenticated(true);
+    setUserInfo(userData);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('userToken');
+    localStorage.removeItem('userEmail');
+    localStorage.removeItem('userId');
+    setIsAuthenticated(false);
+    setUserInfo(null);
+    disconnectWallet();
+  };
+
+  const MainApp = () => (
     <div className="app-wrapper">
       <Navbar 
         account={account}
@@ -230,6 +258,8 @@ function App() {
         onDisconnect={disconnectWallet}
         isLoading={isLoading}
         connectError={connectError}
+        userInfo={userInfo}
+        onLogout={handleLogout}
       />
 
       <div className="App">
@@ -324,6 +354,53 @@ function App() {
         <Modal setModalOpen={setModalOpen} contract={contract}></Modal>
       )}
     </div>
+  );
+
+  return (
+    <Router>
+      <Routes>
+        <Route 
+          path="/login" 
+          element={
+            isAuthenticated ? (
+              <Navigate to="/dashboard" replace />
+            ) : (
+              <Login 
+                onLoginSuccess={handleLoginSuccess}
+                onSwitchToRegister={() => window.location.href = '/register'}
+              />
+            )
+          } 
+        />
+        <Route 
+          path="/register" 
+          element={
+            isAuthenticated ? (
+              <Navigate to="/dashboard" replace />
+            ) : (
+              <Register 
+                onRegisterSuccess={handleLoginSuccess}
+                onSwitchToLogin={() => window.location.href = '/login'}
+              />
+            )
+          } 
+        />
+        <Route 
+          path="/dashboard" 
+          element={
+            isAuthenticated ? (
+              <MainApp />
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          } 
+        />
+        <Route 
+          path="/" 
+          element={<Navigate to={isAuthenticated ? "/dashboard" : "/login"} replace />} 
+        />
+      </Routes>
+    </Router>
   );
 }
 
