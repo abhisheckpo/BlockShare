@@ -1,0 +1,109 @@
+/* Root theme variables */
+:root {
+  --transition-speed: 0.3s;
+}
+
+/* Light Theme (Default) */
+[data-theme="light"] {
+  /* Background colors */
+  --bg-primary: #f0f2f5;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #e4e6eb;
+  --bg-elevated: #fafbfc;
+  
+  /* Text colors */
+  --text-primary: #1c1e21;
+  --text-secondary: #3a3b3c;
+  --text-tertiary: #5a5c5e;
+  --text-muted: #737577;
+  
+  /* Border colors */
+  --border-light: #d0d3d7;
+  --border-medium: #b8bcc2;
+  --border-dark: #9ca3af;
+  
+  /* Accent colors */
+  --primary: #5568ea;
+  --primary-light: #7c8cff;
+  --primary-dark: #3d4fc5;
+  --accent: #e063f7;
+  
+  /* Status colors */
+  --success: #42be65;
+  --success-light: #5ec972;
+  --danger: #fa4d56;
+  --danger-light: #ff6b72;
+  --warning: #f1c21b;
+  
+  /* Shadows */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.12);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.18);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.25);
+  
+  /* Gradient backgrounds */
+  --gradient-primary: linear-gradient(135deg, #5568ea 0%, #6d4fc2 100%);
+  --gradient-auth: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --gradient-card: linear-gradient(135deg, #e8ebf2 0%, #b8c5de 100%);
+}
+
+/* Dark Theme */
+[data-theme="dark"] {
+  /* Background colors */
+  --bg-primary: #0f1419;
+  --bg-secondary: #1a1f29;
+  --bg-tertiary: #252d3d;
+  --bg-elevated: #1e2530;
+  
+  /* Text colors */
+  --text-primary: #e8eaed;
+  --text-secondary: #c5c7ca;
+  --text-tertiary: #9aa0a6;
+  --text-muted: #6c757d;
+  
+  /* Border colors */
+  --border-light: #2d3748;
+  --border-medium: #3d4758;
+  --border-dark: #4d5768;
+  
+  /* Accent colors */
+  --primary: #7c8cff;
+  --primary-light: #9caeff;
+  --primary-dark: #5c6cdf;
+  --accent: #ff6ec7;
+  
+  /* Status colors */
+  --success: #51cf66;
+  --success-light: #69db7c;
+  --danger: #ff6b6b;
+  --danger-light: #ff8787;
+  --warning: #ffd43b;
+  
+  /* Shadows */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+  
+  /* Gradient backgrounds */
+  --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --gradient-auth: linear-gradient(135deg, #1a1f29 0%, #252d3d 100%);
+  --gradient-card: linear-gradient(135deg, #1e2530 0%, #252d3d 100%);
+}
+
+/* Smooth transitions for theme changes */
+* {
+  transition: background-color var(--transition-speed) ease,
+              color var(--transition-speed) ease,
+              border-color var(--transition-speed) ease,
+              box-shadow var(--transition-speed) ease;
+}
+
+/* Don't transition transform and opacity */
+*:is([style*="transform"], [style*="opacity"]) {
+  transition: background-color var(--transition-speed) ease,
+              color var(--transition-speed) ease,
+              border-color var(--transition-speed) ease,
+              box-shadow var(--transition-speed) ease,
+              transform 0.2s ease,
+              opacity 0.2s ease;
+}
+

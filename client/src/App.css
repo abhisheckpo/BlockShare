@@ -3,11 +3,12 @@
   display: flex;
   flex-direction: column;
   position: relative;
+  background: var(--bg-primary);
 }
 
 .App {
   text-align: center;
-  color: var(--text);
+  color: var(--text-primary);
   padding: 2rem 1.5rem;
   max-width: 1400px;
   margin: 0 auto;
@@ -30,18 +31,18 @@
   align-items: center;
   justify-content: center;
   padding: 6rem 2rem;
-  background: rgba(26, 31, 53, 0.4);
+  background: var(--bg-secondary);
   backdrop-filter: blur(20px) saturate(180%);
-  border-radius: var(--radius-lg);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  border: 1px solid var(--border-light);
   margin: 2rem 0;
-  box-shadow: var(--shadow);
-  transition: all var(--transition-medium);
+  box-shadow: var(--shadow-md);
+  transition: all 0.3s ease;
   min-height: 400px;
 }
 
 .connect-prompt:hover {
-  border-color: rgba(255, 255, 255, 0.12);
+  border-color: var(--border-medium);
   box-shadow: var(--shadow-lg);
 }
 
@@ -55,7 +56,7 @@
 .connect-prompt h2 {
   font-size: clamp(1.75rem, 4vw, 2.5rem);
   margin-bottom: 1rem;
-  background: linear-gradient(135deg, var(--text), var(--primary-light));
+  background: var(--gradient-primary);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -75,24 +76,24 @@
   justify-content: center;
   margin-bottom: 3rem;
   padding: 0.75rem;
-  background: rgba(26, 31, 53, 0.5);
+  background: var(--bg-secondary);
   backdrop-filter: blur(20px) saturate(180%);
-  border-radius: var(--radius-lg);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: var(--shadow);
+  border-radius: 20px;
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow-sm);
   position: relative;
 }
 
 .nav-button {
   background: transparent;
   border: none;
-  color: var(--muted);
+  color: var(--text-tertiary);
   padding: 0.875rem 1.75rem;
-  border-radius: var(--radius);
+  border-radius: 12px;
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  transition: all var(--transition-medium);
+  transition: all 0.3s ease;
   display: flex;
   align-items: center;
   gap: 0.625rem;
@@ -114,16 +115,16 @@
 }
 
 .nav-button:hover {
-  color: var(--text);
-  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-primary);
+  background: var(--bg-tertiary);
   transform: translateY(-2px);
 }
 
 .nav-button.active {
-  color: var(--text);
-  background: var(--elevated);
+  color: var(--text-primary);
+  background: var(--bg-elevated);
   box-shadow: var(--shadow-sm);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--border-light);
 }
 
 .nav-button.active::before {
@@ -136,18 +137,18 @@
 }
 
 .share-button {
-  background: linear-gradient(135deg, var(--primary), var(--primary-variant));
-  color: var(--text);
+  background: var(--gradient-primary);
+  color: white;
   margin-left: 1rem;
   padding: 0.875rem 1.75rem;
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-primary);
+  border-radius: 12px;
+  box-shadow: var(--shadow-md);
   border: 1px solid rgba(108, 140, 255, 0.3);
 }
 
 .share-button:hover {
   transform: translateY(-3px) scale(1.02);
-  box-shadow: var(--shadow-primary), var(--glow-primary);
+  box-shadow: var(--shadow-lg);
 }
 
 .share-button::before {
@@ -166,17 +167,17 @@
   margin: 0 auto 2rem;
   max-width: 800px;
   padding: 1.25rem;
-  background: rgba(26, 31, 53, 0.5);
+  background: var(--bg-secondary);
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  transition: all var(--transition-medium);
+  border: 1px solid var(--border-light);
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s ease;
 }
 
 .contract-setup:hover {
-  border-color: rgba(255, 255, 255, 0.12);
-  box-shadow: var(--shadow-lg);
+  border-color: var(--border-medium);
+  box-shadow: var(--shadow-md);
 }
 
 .contract-setup-row {
@@ -188,37 +189,38 @@
   flex: 1;
   height: 48px;
   padding: 0 1rem;
-  color: var(--text);
-  background: var(--elevated);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: var(--radius-sm);
-  font-family: var(--font-mono);
+  color: var(--text-primary);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-light);
+  border-radius: 10px;
+  font-family: 'Courier New', monospace;
   font-size: 0.95rem;
-  transition: all var(--transition-fast);
+  transition: all 0.3s ease;
 }
 
 .contract-input:focus {
+  outline: none;
   border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(108, 140, 255, 0.2);
-  background: var(--elevated-hover);
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+  background: var(--bg-elevated);
 }
 
 .contract-button {
   height: 48px;
   padding: 0 2rem;
   border: none;
-  border-radius: var(--radius-sm);
-  background: linear-gradient(135deg, var(--primary), var(--primary-variant));
-  color: var(--text);
+  border-radius: 10px;
+  background: var(--gradient-primary);
+  color: white;
   font-weight: 600;
   cursor: pointer;
   box-shadow: var(--shadow-sm);
-  transition: all var(--transition-medium);
+  transition: all 0.3s ease;
 }
 
 .contract-button:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: var(--shadow-primary);
+  box-shadow: var(--shadow-md);
 }
 
 .contract-button:disabled {
@@ -228,7 +230,7 @@
 
 .contract-help {
   margin-top: 0.75rem;
-  color: var(--muted);
+  color: var(--text-muted);
   font-size: 0.9rem;
   text-align: center;
 }

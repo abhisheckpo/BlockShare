@@ -87,12 +87,36 @@ const Register = ({ onRegisterSuccess, onSwitchToLogin }) => {
 
   return (
     <div className="auth-container">
-      <div className="auth-box fade-up">
-        <div className="auth-header">
-          <div className="auth-icon">📝</div>
-          <h1>Create Account</h1>
-          <p>Join BlockShare today</p>
+      <div className="auth-left">
+        <div className="auth-branding">
+          <div className="auth-logo">🔗</div>
+          <h1>BlockShare</h1>
+          <p>Your decentralized file storage solution powered by blockchain technology</p>
+          
+          <div className="auth-features">
+            <div className="feature-item">
+              <div className="feature-icon">🔒</div>
+              <span>End-to-end encrypted storage</span>
+            </div>
+            <div className="feature-item">
+              <div className="feature-icon">⚡</div>
+              <span>Lightning-fast access</span>
+            </div>
+            <div className="feature-item">
+              <div className="feature-icon">🌐</div>
+              <span>Distributed & secure</span>
+            </div>
+          </div>
         </div>
+      </div>
+      
+      <div className="auth-right">
+        <div className="auth-box fade-up">
+          <div className="auth-header">
+            <div className="auth-icon">📝</div>
+            <h1>Create Account</h1>
+            <p>Join BlockShare today</p>
+          </div>
 
         <form onSubmit={handleSubmit} className="auth-form">
           {error && <div className="error-message">{error}</div>}
@@ -172,6 +196,7 @@ const Register = ({ onRegisterSuccess, onSwitchToLogin }) => {
             </button>
           </p>
         </div>
+      </div>
       </div>
     </div>
   );

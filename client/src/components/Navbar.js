@@ -1,5 +1,6 @@
 import React from 'react';
 import './Navbar.css';
+import ThemeToggle from './ThemeToggle';
 
 const Navbar = ({ account, onConnect, onDisconnect, isLoading, connectError, userInfo, onLogout }) => {
   return (
@@ -14,6 +15,8 @@ const Navbar = ({ account, onConnect, onDisconnect, isLoading, connectError, use
         </div>
 
         <div className="navbar-menu">
+          <ThemeToggle />
+          
           {userInfo && (
             <>
               <div className="user-info">
